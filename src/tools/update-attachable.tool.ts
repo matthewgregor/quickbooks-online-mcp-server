@@ -2,6 +2,7 @@ import { updateQuickbooksAttachable } from "../handlers/update-quickbooks-attach
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_attachable";
 const toolDescription =
   "Update an existing attachable's metadata (file name, note, category, content type) in QuickBooks Online. This is metadata-only: it CANNOT replace the uploaded file bytes. To attach a different or corrected file, create a new attachable (create_attachable with file_path) and delete the old one.";
@@ -18,7 +19,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await updateQuickbooksAttachable(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Attachable updated:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const UpdateAttachableTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

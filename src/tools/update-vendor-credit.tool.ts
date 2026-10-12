@@ -3,6 +3,7 @@ import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 import { globalTaxCalculationSchema, vendorCreditLineItemSchema } from "./create-vendor-credit.tool.js";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_vendor_credit";
 const toolDescription =
   "Update a vendor credit in QuickBooks Online. Providing line_items REPLACES the entire line array (fetch the current vendor credit first if you only want to modify one line); lines support per-line tax_code_ref and class_ref like bills.";
@@ -23,7 +24,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await updateQuickbooksVendorCredit(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Vendor credit updated:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const UpdateVendorCreditTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

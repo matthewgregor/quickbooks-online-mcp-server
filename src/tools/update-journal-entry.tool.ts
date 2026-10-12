@@ -2,6 +2,7 @@ import { updateQuickbooksJournalEntry } from "../handlers/update-quickbooks-jour
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "update_journal_entry";
 const toolDescription = "Update a journal entry in QuickBooks Online.";
@@ -56,12 +57,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Journal entry updated:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateJournalEntryTool: ToolDefinition<typeof toolSchema> = {

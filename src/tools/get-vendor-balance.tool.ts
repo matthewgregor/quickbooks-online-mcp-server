@@ -2,6 +2,7 @@ import { getQuickbooksVendorBalance } from "../handlers/get-quickbooks-vendor-ba
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_vendor_balance";
 const toolDescription = "Generate a Vendor Balance report from QuickBooks Online showing outstanding balances by vendor.";
 const toolSchema = z.object({
@@ -13,7 +14,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksVendorBalance(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Vendor Balance Report:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetVendorBalanceTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

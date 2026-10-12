@@ -2,6 +2,7 @@ import { createQuickbooksJournalEntry } from "../handlers/create-quickbooks-jour
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "create_journal_entry";
 const toolDescription = "Create a journal entry in QuickBooks Online. Description goes on the Line level, not inside JournalEntryLineDetail.";
@@ -53,12 +54,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Journal entry created:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateJournalEntryTool: ToolDefinition<typeof toolSchema> = {

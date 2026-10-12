@@ -3,11 +3,12 @@ import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 import fs from "fs";
 import path from "path";
+import { jsonResult } from "../helpers/tool-result.js";
 
 const toolName = "get_invoice_pdf";
 const toolDescription =
   "Download a QuickBooks Online invoice as a PDF. Returns the bytes inline " +
-  "(base64) by default. If output_path is supplied, the PDF is written to disk " +
+  "as JSON { invoiceId, contentType, bytes, base64 } by default. If output_path is supplied, the PDF is written to disk " +
   "instead — but only when the QBO_PDF_OUTPUT_DIR environment variable is set " +
   "to an allowlist directory that the resolved path must live inside.";
 
@@ -176,32 +177,25 @@ const toolHandler = async ({ params }: any) => {
         ],
       };
     }
-    return {
-      content: [
-        {
-          type: "text" as const,
-          text: `Wrote ${writeResult.bytes} bytes to ${writeResult.absolutePath}`,
-        },
-      ],
-    };
+    return jsonResult({
+      invoiceId: invoice_id,
+      summary: `Wrote ${writeResult.bytes} bytes to ${writeResult.absolutePath}`,
+      bytes: writeResult.bytes,
+      path: writeResult.absolutePath,
+    });
   }
 
   // Inline mode: return base64 so the host can decide what to do with the
   // bytes. The MCP "resource" content type with a data URI would be even
   // nicer for binary blobs, but base64 over `text` is the lowest-common-
-  // denominator that all current MCP hosts handle.
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: `Invoice ${invoice_id} PDF (${pdf.length} bytes, base64-encoded below):`,
-      },
-      {
-        type: "text" as const,
-        text: pdf.toString("base64"),
-      },
-    ],
-  };
+  // denominator that all current MCP hosts handle. Everything goes in one
+  // JSON content item so clients that read only content[0] get the bytes.
+  return jsonResult({
+    invoiceId: invoice_id,
+    contentType: "application/pdf",
+    bytes: pdf.length,
+    base64: pdf.toString("base64"),
+  });
 };
 
 export const GetInvoicePdfTool: ToolDefinition<typeof toolSchema> = {

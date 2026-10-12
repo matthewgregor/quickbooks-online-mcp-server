@@ -2,6 +2,7 @@ import { searchQuickbooksPurchases } from "../handlers/search-quickbooks-purchas
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "search_purchases";
 const toolDescription = "Search purchases in QuickBooks Online that match given criteria.";
@@ -31,12 +32,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Purchases found:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return searchResult("purchases", response.result);
 };
 
 export const SearchPurchasesTool: ToolDefinition<typeof toolSchema> = {

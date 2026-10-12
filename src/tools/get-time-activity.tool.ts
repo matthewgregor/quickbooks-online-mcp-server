@@ -2,6 +2,7 @@ import { getQuickbooksTimeActivity } from "../handlers/get-quickbooks-time-activ
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_time_activity";
 const toolDescription = "Get a time activity by ID from QuickBooks Online.";
 const toolSchema = z.object({ id: z.string().min(1).describe("Time Activity ID") });
@@ -9,7 +10,7 @@ const toolSchema = z.object({ id: z.string().min(1).describe("Time Activity ID")
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksTimeActivity(params.id);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Time activity found:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetTimeActivityTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

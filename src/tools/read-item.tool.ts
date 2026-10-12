@@ -2,6 +2,7 @@ import { readQuickbooksItem } from "../handlers/read-quickbooks-item.handler.js"
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "read_item";
 const toolDescription = "Read a single item in QuickBooks Online by its ID.";
 
@@ -17,12 +18,7 @@ const toolHandler = async ({ params }: any) => {
     return { content: [{ type: "text" as const, text: `Error reading item ${item_id}: ${response.error}` }] };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Item details for ID ${item_id}:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const ReadItemTool: ToolDefinition<typeof toolSchema> = {

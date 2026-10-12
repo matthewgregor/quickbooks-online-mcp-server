@@ -2,6 +2,7 @@ import { deleteQuickbooksVendor } from "../handlers/delete-quickbooks-vendor.han
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete-vendor";
 const toolDescription = "Delete a vendor in QuickBooks Online.";
 const toolSchema = z.object({
@@ -27,14 +28,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
 
   const vendor = response.result;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(vendor),
-      }
-    ],
-  };
+  return jsonResult(vendor);
 };
 
 export const DeleteVendorTool: ToolDefinition<typeof toolSchema> = {

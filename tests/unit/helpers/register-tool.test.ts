@@ -177,7 +177,26 @@ describe("unsupported parameter reporting", () => {
     expect(result.content[0].text).toContain("create_invoice does not support");
     expect(result.content[0].text).toContain("ship_date");
     expect(result.content[0].text).toContain("customer_ref"); // lists what IS supported
-    expect(result.content[1].text).toBe("ok"); // original response preserved
+    expect(result.content).toHaveLength(1); // no extra content item
+    expect(result.content[0].text).toMatch(/ok$/); // original response preserved
+  });
+
+  it("adds the warning as a field when the response is a JSON object", async () => {
+    const server = { tool: jest.fn() } as unknown as McpServer;
+    const handler = jest.fn(async () => ({ content: [{ type: "text", text: JSON.stringify({ Id: "7" }) }] }));
+    RegisterTool(server, {
+      name: "create_invoice",
+      description: "d",
+      schema: z.object({ customer_ref: z.string() }),
+      handler,
+    } as any);
+    const registered = (server.tool as jest.Mock).mock.calls[0][3] as any;
+    const result = await registered({ params: { customer_ref: "1", ship_date: "2026-09-01" } });
+
+    expect(result.content).toHaveLength(1);
+    const body = JSON.parse(result.content[0].text);
+    expect(body.Id).toBe("7");
+    expect(body.warning).toContain("ship_date");
   });
 
   it("strips unknown keys so they cannot reach QuickBooks", async () => {

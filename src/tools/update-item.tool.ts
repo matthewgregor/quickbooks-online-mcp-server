@@ -2,6 +2,7 @@ import { updateQuickbooksItem } from "../handlers/update-quickbooks-item.handler
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_item";
 const toolDescription = "Update an existing item in Quickbooks by ID (sparse update).";
 
@@ -15,12 +16,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error updating item: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Item updated successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateItemTool: ToolDefinition<typeof toolSchema> = {

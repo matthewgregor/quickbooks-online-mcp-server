@@ -2,6 +2,7 @@ import { getQuickbooksPurchase } from "../handlers/get-quickbooks-purchase.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "get_purchase";
 const toolDescription = "Get a purchase by Id from QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Purchase retrieved:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetPurchaseTool: ToolDefinition<typeof toolSchema> = {

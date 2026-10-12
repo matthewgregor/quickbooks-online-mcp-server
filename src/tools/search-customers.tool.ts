@@ -2,6 +2,7 @@ import { searchQuickbooksCustomers } from "../handlers/search-quickbooks-custome
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_customers";
 const toolDescription = "Search customers in QuickBooks Online that match given criteria.";
 
@@ -80,14 +81,7 @@ const toolHandler = async (args: any) => {
       content: [{ type: "text" as const, text: `Error searching customers: ${response.error}` }],
     };
   }
-  return {
-    content: [
-      { type: "text" as const, text: Array.isArray(response.result) ? `Found ${response.result.length} customers:` : `Count: ${response.result}` },
-      ...(Array.isArray(response.result)
-        ? response.result.map((c) => ({ type: "text" as const, text: JSON.stringify(c) }))
-        : []),
-    ],
-  };
+  return searchResult("customers", response.result);
 };
 
 export const SearchCustomersTool: ToolDefinition<typeof toolSchema> = {

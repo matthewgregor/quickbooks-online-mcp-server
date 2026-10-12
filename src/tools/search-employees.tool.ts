@@ -2,6 +2,7 @@ import { searchQuickbooksEmployees } from "../handlers/search-quickbooks-employe
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "search_employees";
 const toolDescription = "Search employees in QuickBooks Online that match given criteria.";
@@ -31,12 +32,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Employees found:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return searchResult("employees", response.result);
 };
 
 export const SearchEmployeesTool: ToolDefinition<typeof toolSchema> = {

@@ -62,7 +62,7 @@ describe('Preferences handler and tool', () => {
     expect(GetPreferencesTool.name).toBe('get_preferences');
     expect(GetPreferencesTool.schema.parse({})).toEqual({});
     expect(result).toEqual({
-      content: [{ type: 'text', text: JSON.stringify(preferences, null, 2) }],
+      content: [{ type: 'text', text: JSON.stringify(preferences) }],
     });
   });
 

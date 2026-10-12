@@ -107,8 +107,8 @@ describe('journal entry tool handlers', () => {
 
     const result = await createHandler({ params: { journalEntry: { Line: balancedLines } } });
 
-    expect(result.content[0].text).toContain('Journal entry created');
-    expect(result.content[1].text).toContain('"Id":"10"');
+    expect(result.content).toHaveLength(1);
+    expect(JSON.parse(result.content[0].text)).toEqual(created);
   });
 
   it('create handler returns an error message on failure', async () => {
@@ -125,8 +125,8 @@ describe('journal entry tool handlers', () => {
 
     const result = await updateHandler({ params: { journalEntry: { Id: '5', SyncToken: '0' } } });
 
-    expect(result.content[0].text).toContain('Journal entry updated');
-    expect(result.content[1].text).toContain('"SyncToken":"1"');
+    expect(result.content).toHaveLength(1);
+    expect(JSON.parse(result.content[0].text)).toEqual(updated);
   });
 
   it('update handler returns an error message on failure', async () => {

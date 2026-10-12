@@ -2,6 +2,7 @@ import { createQuickbooksCreditMemo } from "../handlers/create-quickbooks-credit
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_credit_memo";
 const toolDescription = "Create a credit memo (customer credit) in QuickBooks Online.";
 
@@ -27,12 +28,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error creating credit memo: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Credit memo created successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateCreditMemoTool: ToolDefinition<typeof toolSchema> = {

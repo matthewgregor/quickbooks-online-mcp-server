@@ -2,6 +2,7 @@ import { getQuickbooksBillPayment } from "../handlers/get-quickbooks-bill-paymen
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "get_bill_payment";
 const toolDescription = "Get a bill payment by Id from QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Bill payment retrieved:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetBillPaymentTool: ToolDefinition<typeof toolSchema> = {

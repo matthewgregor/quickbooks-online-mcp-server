@@ -2,6 +2,7 @@ import { searchQuickbooksJournalEntries } from "../handlers/search-quickbooks-jo
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "search_journal_entries";
 const toolDescription = "Search journal entries in QuickBooks Online that match given criteria.";
@@ -31,12 +32,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Journal entries found:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return searchResult("journalEntries", response.result);
 };
 
 export const SearchJournalEntriesTool: ToolDefinition<typeof toolSchema> = {

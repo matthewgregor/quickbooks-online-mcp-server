@@ -2,6 +2,7 @@ import { createQuickbooksAccount } from "../handlers/create-quickbooks-account.h
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_account";
 const toolDescription =
   "Create a chart‑of‑accounts entry in QuickBooks Online. " +
@@ -24,12 +25,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error creating account: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Account created successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateAccountTool: ToolDefinition<typeof toolSchema> = {

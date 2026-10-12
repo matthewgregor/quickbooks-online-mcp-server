@@ -2,6 +2,7 @@ import { getQuickbooksPurchaseOrder } from "../handlers/get-quickbooks-purchase-
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_purchase_order";
 const toolDescription = "Get a single purchase order by ID from QuickBooks Online.";
 const toolSchema = z.object({ id: z.string().min(1).describe("Purchase Order ID") });
@@ -11,12 +12,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error getting purchase order: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Purchase order found:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetPurchaseOrderTool: ToolDefinition<typeof toolSchema> = {

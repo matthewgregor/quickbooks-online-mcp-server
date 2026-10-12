@@ -2,6 +2,7 @@ import { deleteQuickbooksBill } from "../handlers/delete-quickbooks-bill.handler
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete-bill";
 const toolDescription = "Delete a bill in QuickBooks Online.";
 const toolSchema = z.object({
@@ -27,14 +28,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
 
   const bill = response.result;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(bill),
-      }
-    ],
-  };
+  return jsonResult(bill);
 };
 
 export const DeleteBillTool: ToolDefinition<typeof toolSchema> = {

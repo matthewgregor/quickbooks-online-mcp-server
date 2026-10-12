@@ -2,6 +2,7 @@ import { getQuickbooksBalanceSheet } from "../handlers/get-quickbooks-balance-sh
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_balance_sheet";
 const toolDescription = "Generate a Balance Sheet report from QuickBooks Online showing assets, liabilities, and equity.";
 const toolSchema = z.object({
@@ -14,7 +15,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksBalanceSheet(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Balance Sheet Report:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetBalanceSheetTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

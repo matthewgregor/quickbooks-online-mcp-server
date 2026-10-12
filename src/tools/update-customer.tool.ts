@@ -2,6 +2,7 @@ import { updateQuickbooksCustomer } from "../handlers/update-quickbooks-customer
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_customer";
 const toolDescription =
   "Update an existing customer in QuickBooks Online. The customer object must include Id and SyncToken (add sparse: true for a partial update). Tax info fields work as in create_customer (e.g. PrimaryTaxIdentifier for the tax registration number / EU VAT number / CIF, DefaultTaxCodeRef for the default sales tax code); responses always return PrimaryTaxIdentifier masked.";
@@ -20,12 +21,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Customer updated:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateCustomerTool: ToolDefinition<typeof toolSchema> = {

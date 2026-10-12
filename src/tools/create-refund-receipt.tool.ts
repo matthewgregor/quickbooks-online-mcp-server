@@ -2,6 +2,7 @@ import { createQuickbooksRefundReceipt } from "../handlers/create-quickbooks-ref
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_refund_receipt";
 const toolDescription = "Create a refund receipt (customer refund) in QuickBooks Online.";
 
@@ -29,12 +30,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error creating refund receipt: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Refund receipt created successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateRefundReceiptTool: ToolDefinition<typeof toolSchema> = {

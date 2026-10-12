@@ -2,6 +2,7 @@ import { searchQuickbooksVendors } from "../handlers/search-quickbooks-vendors.h
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_vendors";
 const toolDescription = "Search vendors in QuickBooks Online that match given criteria.";
 
@@ -97,13 +98,6 @@ export const SearchVendorsTool: ToolDefinition<typeof toolSchema> = {
         content: [{ type: "text" as const, text: `Error searching vendors: ${response.error}` }],
       };
     }
-    return {
-      content: [
-        { type: "text" as const, text: Array.isArray(response.result) ? `Found ${response.result.length} vendors:` : `Count: ${response.result}` },
-        ...(Array.isArray(response.result)
-          ? response.result.map((v) => ({ type: "text" as const, text: JSON.stringify(v) }))
-          : []),
-      ],
-    };
+    return searchResult("vendors", response.result);
   },
 }; 

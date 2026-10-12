@@ -44,9 +44,14 @@ describe('GetInvoicePdfTool', () => {
 
       const result = await handler({ invoice_id: '42' });
 
-      expect(result.content).toHaveLength(2);
-      expect(result.content[0].text).toContain('Invoice 42 PDF');
-      expect(result.content[1].text).toBe(pdf.toString('base64'));
+      expect(result.content).toHaveLength(1);
+      const body = JSON.parse(result.content[0].text);
+      expect(body).toEqual({
+        invoiceId: '42',
+        contentType: 'application/pdf',
+        bytes: pdf.length,
+        base64: pdf.toString('base64'),
+      });
     });
 
     it('surfaces handler-level errors verbatim', async () => {

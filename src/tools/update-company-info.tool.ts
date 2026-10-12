@@ -2,6 +2,7 @@ import { updateQuickbooksCompanyInfo } from "../handlers/update-quickbooks-compa
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_company_info";
 const toolDescription = "Update the company information in QuickBooks Online.";
 const toolSchema = z.object({
@@ -24,7 +25,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await updateQuickbooksCompanyInfo(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Company info updated:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const UpdateCompanyInfoTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

@@ -2,6 +2,7 @@ import { updateQuickbooksEmployee } from "../handlers/update-quickbooks-employee
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "update_employee";
 const toolDescription = "Update an employee in QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Employee updated:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateEmployeeTool: ToolDefinition<typeof toolSchema> = {

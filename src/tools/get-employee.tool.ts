@@ -2,6 +2,7 @@ import { getQuickbooksEmployee } from "../handlers/get-quickbooks-employee.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "get_employee";
 const toolDescription = "Get an employee by Id from QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Employee retrieved:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetEmployeeTool: ToolDefinition<typeof toolSchema> = {

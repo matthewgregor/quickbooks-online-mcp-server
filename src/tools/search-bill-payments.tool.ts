@@ -2,6 +2,7 @@ import { searchQuickbooksBillPayments } from "../handlers/search-quickbooks-bill
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "search_bill_payments";
 const toolDescription = "Search bill payments in QuickBooks Online that match given criteria.";
@@ -31,12 +32,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Bill payments found:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return searchResult("billPayments", response.result);
 };
 
 export const SearchBillPaymentsTool: ToolDefinition<typeof toolSchema> = {

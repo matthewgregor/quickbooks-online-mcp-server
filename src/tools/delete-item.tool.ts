@@ -2,6 +2,7 @@ import { deleteQuickbooksItem } from "../handlers/delete-quickbooks-item.handler
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete_item";
 const toolDescription = "Delete (make inactive) an item in QuickBooks Online.";
 const toolSchema = z.object({ idOrEntity: z.any() });
@@ -13,12 +14,7 @@ const toolHandler = async (args: any) => {
     return { content: [{ type: "text" as const, text: `Error deleting item: ${response.error}` }] };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Item deleted (made inactive):` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeleteItemTool: ToolDefinition<typeof toolSchema> = {

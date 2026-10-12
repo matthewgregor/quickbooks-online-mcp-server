@@ -2,6 +2,7 @@ import { searchQuickbooksBills } from "../handlers/search-quickbooks-bills.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_bills";
 const toolDescription = "Search bills in QuickBooks Online that match given criteria.";
 
@@ -90,13 +91,6 @@ export const SearchBillsTool: ToolDefinition<typeof toolSchema> = {
         content: [{ type: "text" as const, text: `Error searching bills: ${response.error}` }],
       };
     }
-    return {
-      content: [
-        { type: "text" as const, text: Array.isArray(response.result) ? `Found ${response.result.length} bills:` : `Count: ${response.result}` },
-        ...(Array.isArray(response.result)
-          ? response.result.map((b) => ({ type: "text" as const, text: JSON.stringify(b) }))
-          : []),
-      ],
-    };
+    return searchResult("bills", response.result);
   },
 }; 

@@ -2,6 +2,7 @@ import { createQuickbooksAttachable } from "../handlers/create-quickbooks-attach
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_attachable";
 const toolDescription =
   "Create an attachable (file attachment) in QuickBooks Online. File content can come from file_path (a file on the machine running this server — preferred for local files of any size), file_url (an https URL the server downloads), or base64_content (inline bytes — only practical for small files). Precedence: file_url/file_path (mutually exclusive) win over base64_content. With no file source, creates a metadata-only attachment record. Max file size 100 MB (QBO limit).";
@@ -50,12 +51,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await createQuickbooksAttachable(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return {
-    content: [
-      { type: "text" as const, text: `Attachable created:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateAttachableTool: ToolDefinition<typeof toolSchema> = {

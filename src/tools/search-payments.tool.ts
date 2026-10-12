@@ -2,6 +2,7 @@ import { searchQuickbooksPayments } from "../handlers/search-quickbooks-payments
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_payments";
 const toolDescription = "Search for payments in QuickBooks Online.";
 
@@ -17,12 +18,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error searching payments: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${response.result.length} payment(s):` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return searchResult("payments", response.result);
 };
 
 export const SearchPaymentsTool: ToolDefinition<typeof toolSchema> = {

@@ -2,6 +2,7 @@ import { searchQuickbooksVendorCredits } from "../handlers/search-quickbooks-ven
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_vendor_credits";
 const toolDescription = "Search for vendor credits in QuickBooks Online.";
 const toolSchema = z.object({
@@ -12,7 +13,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await searchQuickbooksVendorCredits(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Found ${response.result.length} vendor credit(s):` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return searchResult("vendorCredits", response.result);
 };
 
 export const SearchVendorCreditsTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };
