@@ -2,6 +2,7 @@ import { createQuickbooksBillPayment } from "../handlers/create-quickbooks-bill-
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "create_bill_payment";
 const toolDescription = "Create a bill payment in QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Bill payment created:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateBillPaymentTool: ToolDefinition<typeof toolSchema> = {

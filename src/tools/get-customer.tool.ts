@@ -2,6 +2,7 @@ import { getQuickbooksCustomer } from "../handlers/get-quickbooks-customer.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_customer";
 const toolDescription = "Get a customer by Id from QuickBooks Online.";
 const toolSchema = z.object({ id: z.string() });
@@ -20,12 +21,7 @@ const toolHandler = async (args: { [key: string]: ToolParams }) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Customer:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetCustomerTool: ToolDefinition<typeof toolSchema> = {

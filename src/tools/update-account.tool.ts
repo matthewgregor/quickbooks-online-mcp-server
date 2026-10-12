@@ -2,6 +2,7 @@ import { updateQuickbooksAccount } from "../handlers/update-quickbooks-account.h
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_account";
 const toolDescription = "Update an existing chart‑of‑accounts entry in Quickbooks.";
 
@@ -15,12 +16,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error updating account: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Account updated successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateAccountTool: ToolDefinition<typeof toolSchema> = {

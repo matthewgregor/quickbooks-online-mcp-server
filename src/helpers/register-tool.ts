@@ -112,6 +112,25 @@ export function unsupportedParamsWarning(
   );
 }
 
+/** Attach a warning to a response without adding a second content item. */
+export function withWarning(content: any[], warning: string): any[] {
+  const first = content[0];
+  if (!first || first.type !== "text" || typeof first.text !== "string") {
+    return [{ type: "text" as const, text: warning }, ...content];
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(first.text);
+  } catch {
+    parsed = undefined;
+  }
+  const text =
+    parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? JSON.stringify({ warning, ...(parsed as Record<string, unknown>) })
+      : `${warning}\n\n${first.text}`;
+  return [{ ...first, text }, ...content.slice(1)];
+}
+
 export function RegisterTool<T extends z.ZodType<any, any>>(
   server: McpServer,
   toolDefinition: ToolDefinition<T>
@@ -150,8 +169,11 @@ export function RegisterTool<T extends z.ZodType<any, any>>(
 
     try {
       if (warning && result && Array.isArray(result.content)) {
-        // Prepended so it cannot be missed, and added even on error responses.
-        result.content.unshift({ type: "text" as const, text: warning });
+        // Merged into the existing first item rather than added as a new one:
+        // clients that read only content[0] must still get the data. A JSON
+        // object gets a `warning` field so the text keeps parsing; any other
+        // text (error messages) gets the warning prepended.
+        result.content = withWarning(result.content, warning);
       }
     } catch {
       /* diagnostics must never break a working call */

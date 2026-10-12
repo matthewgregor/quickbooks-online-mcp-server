@@ -2,6 +2,7 @@ import { getQuickbooksTrialBalance } from "../handlers/get-quickbooks-trial-bala
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_trial_balance";
 const toolDescription = "Generate a Trial Balance report from QuickBooks Online showing all account balances.";
 const toolSchema = z.object({
@@ -13,7 +14,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksTrialBalance(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Trial Balance Report:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetTrialBalanceTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

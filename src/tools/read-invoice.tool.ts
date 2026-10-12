@@ -2,6 +2,7 @@ import { readQuickbooksInvoice } from "../handlers/read-quickbooks-invoice.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "read_invoice";
 const toolDescription = "Read a single invoice from QuickBooks Online by its ID.";
 
@@ -24,18 +25,7 @@ const toolHandler = async ({ params }: any) => {
     };
   }
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: `Invoice details for ID ${invoice_id}:`,
-      },
-      {
-        type: "text" as const,
-        text: JSON.stringify(response.result, null, 2),
-      },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const ReadInvoiceTool: ToolDefinition<typeof toolSchema> = {

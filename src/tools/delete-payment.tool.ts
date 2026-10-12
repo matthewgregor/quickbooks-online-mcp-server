@@ -2,6 +2,7 @@ import { deleteQuickbooksPayment } from "../handlers/delete-quickbooks-payment.h
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete_payment";
 const toolDescription = "Delete (void) a payment in QuickBooks Online.";
 const toolSchema = z.object({ idOrEntity: z.any() });
@@ -13,12 +14,7 @@ const toolHandler = async (args: any) => {
     return { content: [{ type: "text" as const, text: `Error deleting payment: ${response.error}` }] };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Payment deleted:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeletePaymentTool: ToolDefinition<typeof toolSchema> = {

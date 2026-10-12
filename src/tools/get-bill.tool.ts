@@ -2,6 +2,7 @@ import { getQuickbooksBill } from "../handlers/get-quickbooks-bill.handler.js";
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get-bill";
 const toolDescription = "Get a bill by ID from QuickBooks Online.";
 const toolSchema = z.object({
@@ -24,14 +25,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
 
   const bill = response.result;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(bill),
-      }
-    ],
-  };
+  return jsonResult(bill);
 };
 
 export const GetBillTool: ToolDefinition<typeof toolSchema> = {

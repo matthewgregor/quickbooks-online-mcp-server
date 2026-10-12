@@ -2,6 +2,7 @@ import { createQuickbooksTerm } from "../handlers/create-quickbooks-term.handler
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_term";
 const toolDescription = "Create a new payment term in QuickBooks Online (e.g., Net 30, Due on Receipt).";
 const toolSchema = z.object({
@@ -18,7 +19,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await createQuickbooksTerm(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Term created:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const CreateTermTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

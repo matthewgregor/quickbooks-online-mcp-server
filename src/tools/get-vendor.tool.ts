@@ -2,6 +2,7 @@ import { getQuickbooksVendor } from "../handlers/get-quickbooks-vendor.handler.j
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get-vendor";
 const toolDescription = "Get a vendor by ID from QuickBooks Online.";
 const toolSchema = z.object({
@@ -24,14 +25,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
 
   const vendor = response.result;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(vendor),
-      }
-    ],
-  };
+  return jsonResult(vendor);
 };
 
 export const GetVendorTool: ToolDefinition<typeof toolSchema> = {

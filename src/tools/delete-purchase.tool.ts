@@ -2,6 +2,7 @@ import { deleteQuickbooksPurchase } from "../handlers/delete-quickbooks-purchase
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "delete_purchase";
 const toolDescription = "Delete (make inactive) a purchase in QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Purchase deleted:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeletePurchaseTool: ToolDefinition<typeof toolSchema> = {

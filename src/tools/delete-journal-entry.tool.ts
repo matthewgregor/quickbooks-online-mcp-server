@@ -2,6 +2,7 @@ import { deleteQuickbooksJournalEntry } from "../handlers/delete-quickbooks-jour
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "delete_journal_entry";
 const toolDescription = "Delete (make inactive) a journal entry in QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Journal entry deleted:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeleteJournalEntryTool: ToolDefinition<typeof toolSchema> = {

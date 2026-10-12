@@ -5,6 +5,18 @@ All notable changes to the QuickBooks Online MCP Server are documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **Tool responses are now a single JSON content item.** Every successful tool call returns exactly one `text` item whose text is valid JSON, with no label line. Previously search tools returned a "Found N ..." line followed by one item per record, and report/get/create/update/delete tools returned a label line followed by the JSON, so clients and gateways that read only `content[0]` received no data.
+  - `search_*` tools return `{ "count": N, "<entity>": [...] }`, e.g. `{ "count": 106, "invoices": [...] }`, `{ "count": 111, "bills": [...] }`. Count-only queries (`count: true`) return `{ "count": N }`.
+  - Report tools (`get_aged_payables`, `get_profit_and_loss`, ...) return the QBO report object as-is.
+  - `get_*`, `read_*`, `create_*`, `update_*` and `delete_*` tools return the QBO entity as-is.
+  - `get_invoice_pdf` returns `{ "invoiceId", "contentType", "bytes", "base64" }` inline, or `{ "invoiceId", "summary", "bytes", "path" }` when writing to disk.
+  - JSON is no longer pretty-printed.
+  - The unsupported-parameter warning is added as a `warning` field on the JSON object instead of a separate content item. Error responses are unchanged (one plain-text item).
+
 ## [0.0.1] - 2024-01-13
 
 ### Summary

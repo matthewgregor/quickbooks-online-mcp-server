@@ -2,6 +2,7 @@ import { createQuickbooksVendorCredit } from "../handlers/create-quickbooks-vend
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_vendor_credit";
 const toolDescription =
   "Create a vendor credit in QuickBooks Online. Supports per-line sales tax (tax_code_ref) and class tracking (class_ref) the same way bills do — for companies using the global tax model (CA/UK/AU etc.), set each line's tax_code_ref and a top-level global_tax_calculation so QBO auto-calculates TxnTaxDetail.";
@@ -54,7 +55,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await createQuickbooksVendorCredit(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Vendor credit created:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const CreateVendorCreditTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

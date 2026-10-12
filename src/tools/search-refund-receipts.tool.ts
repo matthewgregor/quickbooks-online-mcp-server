@@ -2,6 +2,7 @@ import { searchQuickbooksRefundReceipts } from "../handlers/search-quickbooks-re
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_refund_receipts";
 const toolDescription = "Search for refund receipts in QuickBooks Online.";
 
@@ -17,12 +18,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error searching refund receipts: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${response.result.length} refund receipt(s):` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return searchResult("refundReceipts", response.result);
 };
 
 export const SearchRefundReceiptsTool: ToolDefinition<typeof toolSchema> = {

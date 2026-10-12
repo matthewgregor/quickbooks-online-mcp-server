@@ -2,6 +2,7 @@ import { updateQuickbooksBill } from "../handlers/update-quickbooks-bill.handler
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update-bill";
 const toolDescription =
   "Update a bill in QuickBooks Online. Performs a read-merge-write: the current bill " +
@@ -76,14 +77,7 @@ const toolHandler = async (args: { [x: string]: any }) => {
 
   const bill = response.result;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: JSON.stringify(bill),
-      },
-    ],
-  };
+  return jsonResult(bill);
 };
 
 export const UpdateBillTool: ToolDefinition<typeof toolSchema> = {

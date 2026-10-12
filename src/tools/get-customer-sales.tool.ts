@@ -2,6 +2,7 @@ import { getQuickbooksCustomerSales } from "../handlers/get-quickbooks-customer-
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_customer_sales";
 const toolDescription = "Generate a Customer Sales report from QuickBooks Online showing sales by customer.";
 const toolSchema = z.object({
@@ -14,7 +15,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksCustomerSales(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Customer Sales Report:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetCustomerSalesTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

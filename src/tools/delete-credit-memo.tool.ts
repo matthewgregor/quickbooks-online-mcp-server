@@ -2,6 +2,7 @@ import { deleteQuickbooksCreditMemo } from "../handlers/delete-quickbooks-credit
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete_credit_memo";
 const toolDescription = "Delete (void) a credit memo in QuickBooks Online.";
 const toolSchema = z.object({ idOrEntity: z.any() });
@@ -11,12 +12,7 @@ const toolHandler = async (args: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error deleting credit memo: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Credit memo deleted:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeleteCreditMemoTool: ToolDefinition<typeof toolSchema> = {

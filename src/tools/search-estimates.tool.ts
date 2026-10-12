@@ -2,6 +2,7 @@ import { searchQuickbooksEstimates } from "../handlers/search-quickbooks-estimat
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_estimates";
 const toolDescription = "Search estimates in QuickBooks Online that match given criteria.";
 
@@ -83,13 +84,6 @@ export const SearchEstimatesTool: ToolDefinition<typeof toolSchema> = {
         content: [{ type: "text" as const, text: `Error searching estimates: ${response.error}` }],
       };
     }
-    return {
-      content: [
-        { type: "text" as const, text: Array.isArray(response.result) ? `Found ${response.result.length} estimates:` : `Count: ${response.result}` },
-        ...(Array.isArray(response.result)
-          ? response.result.map((e) => ({ type: "text" as const, text: JSON.stringify(e) }))
-          : []),
-      ],
-    };
+    return searchResult("estimates", response.result);
   },
 }; 

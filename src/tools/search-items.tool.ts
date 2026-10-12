@@ -2,6 +2,7 @@ import { searchQuickbooksItems } from "../handlers/search-quickbooks-items.handl
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_items";
 const toolDescription = "Search items in QuickBooks Online using criteria (maps to node-quickbooks findItems).";
 
@@ -108,12 +109,7 @@ const toolHandler = async ({ params }: any) => {
     return { content: [{ type: "text" as const, text: `Error searching items: ${response.error}` }] };
   }
   const items = response.result;
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${items?.length || 0} items` },
-      ...(items?.map((item) => ({ type: "text" as const, text: JSON.stringify(item) })) || []),
-    ],
-  };
+  return searchResult("items", items);
 };
 
 function isValidItemValueType(field: string, value: any): boolean {

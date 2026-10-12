@@ -2,6 +2,7 @@ import { getQuickbooksAgedPayables } from "../handlers/get-quickbooks-aged-payab
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_aged_payables";
 const toolDescription = "Generate an Aged Payables (A/P Aging) report from QuickBooks Online showing outstanding vendor bills.";
 const toolSchema = z.object({
@@ -15,7 +16,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await getQuickbooksAgedPayables(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Aged Payables Report:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return jsonResult(response.result);
 };
 
 export const GetAgedPayablesTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

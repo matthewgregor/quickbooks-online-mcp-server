@@ -2,6 +2,7 @@ import { searchQuickbooksInvoices } from "../handlers/search-quickbooks-invoices
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_invoices";
 const toolDescription = "Search invoices in QuickBooks Online using criteria (maps to node-quickbooks findInvoices).";
 
@@ -122,12 +123,7 @@ const toolHandler = async ({ params }: any) => {
     };
   }
   const invoices = response.result;
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${invoices?.length || 0} invoices` },
-      ...(invoices?.map((inv) => ({ type: "text" as const, text: JSON.stringify(inv) })) || []),
-    ],
-  };
+  return searchResult("invoices", invoices);
 };
 
 export const SearchInvoicesTool: ToolDefinition<typeof toolSchema> = {

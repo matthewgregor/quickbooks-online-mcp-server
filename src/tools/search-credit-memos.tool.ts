@@ -2,6 +2,7 @@ import { searchQuickbooksCreditMemos } from "../handlers/search-quickbooks-credi
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_credit_memos";
 const toolDescription = "Search for credit memos in QuickBooks Online.";
 
@@ -17,12 +18,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error searching credit memos: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${response.result.length} credit memo(s):` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return searchResult("creditMemos", response.result);
 };
 
 export const SearchCreditMemosTool: ToolDefinition<typeof toolSchema> = {

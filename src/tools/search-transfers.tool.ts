@@ -2,6 +2,7 @@ import { searchQuickbooksTransfers } from "../handlers/search-quickbooks-transfe
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_transfers";
 const toolDescription = "Search for transfers in QuickBooks Online.";
 const toolSchema = z.object({
@@ -13,7 +14,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await searchQuickbooksTransfers(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Found ${response.result.length} transfer(s):` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return searchResult("transfers", response.result);
 };
 
 export const SearchTransfersTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

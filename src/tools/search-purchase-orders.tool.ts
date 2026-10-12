@@ -2,6 +2,7 @@ import { searchQuickbooksPurchaseOrders } from "../handlers/search-quickbooks-pu
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_purchase_orders";
 const toolDescription = "Search for purchase orders in QuickBooks Online.";
 
@@ -17,12 +18,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error searching purchase orders: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${response.result.length} purchase order(s):` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return searchResult("purchaseOrders", response.result);
 };
 
 export const SearchPurchaseOrdersTool: ToolDefinition<typeof toolSchema> = {

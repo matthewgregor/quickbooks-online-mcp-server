@@ -2,6 +2,7 @@ import { searchQuickbooksTaxRates } from "../handlers/search-quickbooks-tax-rate
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_tax_rates";
 const toolDescription = "Search for tax rates in QuickBooks Online with optional filters.";
 const toolSchema = z.object({
@@ -13,7 +14,7 @@ const toolSchema = z.object({
 const toolHandler = async ({ params }: any) => {
   const response = await searchQuickbooksTaxRates(params);
   if (response.isError) return { content: [{ type: "text" as const, text: `Error: ${response.error}` }] };
-  return { content: [{ type: "text" as const, text: `Found ${response.result.length} tax rates:` }, { type: "text" as const, text: JSON.stringify(response.result, null, 2) }] };
+  return searchResult("taxRates", response.result);
 };
 
 export const SearchTaxRatesTool: ToolDefinition<typeof toolSchema> = { name: toolName, description: toolDescription, schema: toolSchema, handler: toolHandler };

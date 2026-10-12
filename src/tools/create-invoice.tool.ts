@@ -2,6 +2,7 @@ import { createQuickbooksInvoice } from "../handlers/create-quickbooks-invoice.h
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "create_invoice";
 const toolDescription = "Create an invoice in QuickBooks Online.";
 
@@ -61,12 +62,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error creating invoice: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Invoice created successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateInvoiceTool: ToolDefinition<typeof toolSchema> = {

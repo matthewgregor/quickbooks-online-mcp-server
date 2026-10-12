@@ -2,6 +2,7 @@ import { createQuickbooksEmployee } from "../handlers/create-quickbooks-employee
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 // Define the tool metadata
 const toolName = "create_employee";
 const toolDescription = "Create an employee in QuickBooks Online.";
@@ -25,12 +26,7 @@ const toolHandler = async (args: any) => {
     };
   }
 
-  return {
-    content: [
-      { type: "text" as const, text: `Employee created:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const CreateEmployeeTool: ToolDefinition<typeof toolSchema> = {

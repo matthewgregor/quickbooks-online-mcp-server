@@ -2,6 +2,7 @@ import { deleteQuickbooksSalesReceipt } from "../handlers/delete-quickbooks-sale
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "delete_sales_receipt";
 const toolDescription = "Delete (void) a sales receipt in QuickBooks Online.";
 const toolSchema = z.object({ idOrEntity: z.any() });
@@ -11,12 +12,7 @@ const toolHandler = async (args: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error deleting sales receipt: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Sales receipt deleted:` },
-      { type: "text" as const, text: JSON.stringify(response.result) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const DeleteSalesReceiptTool: ToolDefinition<typeof toolSchema> = {

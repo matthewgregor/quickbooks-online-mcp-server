@@ -2,6 +2,7 @@ import { getQuickbooksRefundReceipt } from "../handlers/get-quickbooks-refund-re
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "get_refund_receipt";
 const toolDescription = "Get a single refund receipt by ID from QuickBooks Online.";
 const toolSchema = z.object({
@@ -13,12 +14,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error getting refund receipt: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Refund receipt found:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const GetRefundReceiptTool: ToolDefinition<typeof toolSchema> = {

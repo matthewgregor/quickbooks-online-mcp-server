@@ -2,6 +2,7 @@ import { searchQuickbooksAccounts } from "../handlers/search-quickbooks-accounts
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { searchResult } from "../helpers/tool-result.js";
 const toolName = "search_accounts";
 const toolDescription = "Search chart‑of‑accounts entries using criteria.";
 
@@ -181,12 +182,7 @@ const toolHandler = async ({ params }: any) => {
     return { content: [{ type: "text" as const, text: `Error searching accounts: ${response.error}` }] };
   }
   const accounts = response.result;
-  return {
-    content: [
-      { type: "text" as const, text: `Found ${accounts?.length || 0} accounts:` },
-      ...(accounts?.map((acc: any) => ({ type: "text" as const, text: JSON.stringify(acc) })) || []),
-    ],
-  };
+  return searchResult("accounts", accounts);
 };
 
 // Update export

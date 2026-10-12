@@ -2,6 +2,7 @@ import { updateQuickbooksRefundReceipt } from "../handlers/update-quickbooks-ref
 import { ToolDefinition } from "../types/tool-definition.js";
 import { z } from "zod";
 
+import { jsonResult } from "../helpers/tool-result.js";
 const toolName = "update_refund_receipt";
 const toolDescription = "Update an existing refund receipt in QuickBooks Online.";
 
@@ -18,12 +19,7 @@ const toolHandler = async ({ params }: any) => {
   if (response.isError) {
     return { content: [{ type: "text" as const, text: `Error updating refund receipt: ${response.error}` }] };
   }
-  return {
-    content: [
-      { type: "text" as const, text: `Refund receipt updated successfully:` },
-      { type: "text" as const, text: JSON.stringify(response.result, null, 2) },
-    ],
-  };
+  return jsonResult(response.result);
 };
 
 export const UpdateRefundReceiptTool: ToolDefinition<typeof toolSchema> = {
