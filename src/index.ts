@@ -439,7 +439,16 @@ const main = async () => {
   await server.connect(transport);
 };
 
-main().catch((error) => {
-  console.error("Error:", error);
-  process.exit(1);
-});
+// `npx <package> auth [--manual]` runs the OAuth helper instead of the stdio
+// server, since npx only exposes the package's single bin entry.
+if (process.argv[2] === "auth") {
+  import("./auth-server.js").catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+  });
+} else {
+  main().catch((error) => {
+    console.error("Error:", error);
+    process.exit(1);
+  });
+}

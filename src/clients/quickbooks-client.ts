@@ -421,6 +421,72 @@ export class QuickbooksClient {
     });
   }
 
+  // Console paste-back OAuth flow, for hosts where no local callback server can
+  // be reached (production apps, which Intuit forbids from using a localhost
+  // redirect, and headless/containerized deployments). The operator opens the
+  // printed authorize URL in any browser; Intuit redirects to the registered
+  // QUICKBOOKS_REDIRECT_URI, which need not serve anything, and the operator
+  // pastes the full redirected URL back. Exactly one exchange is attempted:
+  // re-exchanging a one-time code trips Intuit's replay protection and revokes
+  // the tokens issued by the first exchange.
+  async authorizeWithPastedRedirect(
+    readRedirectUrl: (authorizeUri: string) => Promise<string>
+  ): Promise<{ refreshToken: string; realmId: string; tokenStorePath: string; saveError?: unknown }> {
+    if (this.environment === 'production' && /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])/i.test(this.redirectUri)) {
+      throw new Error(
+        `QUICKBOOKS_REDIRECT_URI is "${this.redirectUri}", which Intuit rejects for production apps. ` +
+        'Set it to an HTTPS URL that is registered under Redirect URIs in the Intuit app\'s production settings.'
+      );
+    }
+
+    const expectedState = crypto.randomBytes(24).toString('hex');
+    const authUri = this.oauthClient.authorizeUri({
+      scope: [OAuthClient.scopes.Accounting as string],
+      state: expectedState,
+    }).toString();
+
+    const pasted = (await readRedirectUrl(authUri)).trim().replace(/^["']|["']$/g, '');
+    const queryIndex = pasted.indexOf('?');
+    if (queryIndex === -1) {
+      throw new Error('The pasted URL has no query string. Paste the full URL from the browser address bar after the redirect.');
+    }
+    const params = new URLSearchParams(pasted.substring(queryIndex + 1));
+
+    const oauthError = params.get('error');
+    if (oauthError) {
+      throw new Error(`Intuit returned an error instead of a code: ${oauthError}${params.get('error_description') ? ` (${params.get('error_description')})` : ''}`);
+    }
+    if (params.get('state') !== expectedState) {
+      throw new Error('The state parameter in the pasted URL does not match this run. Paste the URL from the authorization you started in this session.');
+    }
+    if (!params.get('code') || !params.get('realmId')) {
+      throw new Error('The pasted URL is missing the code or realmId parameter.');
+    }
+
+    const response = await this.oauthClient.createToken(pasted);
+    const tokens = response.token;
+    if (!tokens.refresh_token || !tokens.realmId) {
+      throw new Error('Token exchange succeeded but did not return a refresh token and realm ID.');
+    }
+
+    this.refreshToken = tokens.refresh_token;
+    this.realmId = tokens.realmId;
+    this.accessToken = tokens.access_token;
+    this.accessTokenExpiry = new Date(Date.now() + (tokens.expires_in || 3600) * 1000);
+
+    // Persisting is best effort: the caller prints the tokens, so an
+    // unwritable store (e.g. a container with no volume) does not lose them.
+    let saveError: unknown;
+    try {
+      fs.mkdirSync(path.dirname(TOKEN_STORE_PATH), { recursive: true });
+      this.saveTokensToEnv();
+    } catch (err) {
+      saveError = err;
+    }
+
+    return { refreshToken: tokens.refresh_token, realmId: tokens.realmId, tokenStorePath: TOKEN_STORE_PATH, saveError };
+  }
+
   private saveTokensToEnv(): void {
     const tokenPath = TOKEN_STORE_PATH;
     const envContent = fs.existsSync(tokenPath) ? fs.readFileSync(tokenPath, 'utf-8') : '';
