@@ -22,7 +22,9 @@
  *
  * Tokens are saved to the token store (.env, or QUICKBOOKS_TOKEN_STORE_PATH)
  * and, in manual mode, also printed so they can be copied into a host's env
- * config when the store does not persist.
+ * config when the store does not persist. A server already running against the
+ * same token store notices the change and loads the new tokens on its next tool
+ * call, so it does not need restarting.
  */
 
 import readline from 'readline';
@@ -57,7 +59,8 @@ async function runManual() {
   console.log('\nIf the token store does not persist across restarts, set these in the host env config:\n');
   console.log(`QUICKBOOKS_REFRESH_TOKEN=${result.refreshToken}`);
   console.log(`QUICKBOOKS_REALM_ID=${result.realmId}`);
-  console.log('\nThen restart the MCP server so it picks up the new refresh token.');
+  console.log('\nA running MCP server that uses the same token store loads the new tokens on its next');
+  console.log('tool call, with no restart. Otherwise restart the MCP server so it picks them up.');
 }
 
 async function runLocalCallback() {
