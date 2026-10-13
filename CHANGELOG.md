@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Running server reloads re-authorized tokens.** When `QUICKBOOKS_REFRESH_TOKEN` / `QUICKBOOKS_REALM_ID` in the token store are changed by another process (for example `npx <package> auth` run inside the same container), the server notices on its next tool call, updates its own `process.env` and client, and uses the new tokens without a restart. The server also keeps `process.env` in step when it rotates or obtains tokens itself.
+
 ### Changed
 
 - **Tool responses are now a single JSON content item.** Every successful tool call returns exactly one `text` item whose text is valid JSON, with no label line. Previously search tools returned a "Found N ..." line followed by one item per record, and report/get/create/update/delete tools returned a label line followed by the JSON, so clients and gateways that read only `content[0]` received no data.

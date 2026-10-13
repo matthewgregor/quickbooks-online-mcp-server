@@ -392,6 +392,26 @@ The Intuit Developer Portal **rejects `http://localhost` redirect URIs in produc
 1. **ngrok tunnel (most common):** run `ngrok http 8000`, then on your Intuit app go to **Settings → Redirect URIs** and add the generated `https://<id>.ngrok-free.app/callback` URL. Use that URL for the OAuth handshake, then revert to localhost afterwards.
 2. **Deploy a small public callback handler** (e.g., on a VPS or serverless function) that captures the auth code and hands it back to your local setup. More involved; only needed if you can't use ngrok.
 
+### Manual (paste-back) authorization
+
+For production apps, or hosts with no browser or reachable port (SSH sessions, containers), the auth helper can run without a callback server:
+
+```sh
+# from a checkout
+npm run auth -- --manual
+# or where the server is launched with npx
+npx -y github:matthewgregor/quickbooks-online-mcp-server auth --manual
+```
+
+Manual mode is used automatically when `QUICKBOOKS_ENVIRONMENT=production`. It prints an authorize URL. Open it in any browser, authorize the company, then copy the full URL from the address bar after the redirect and paste it into the prompt. The page at the redirect URI does not need to serve anything; only the `code`, `state` and `realmId` in the URL are used. Paste it within a few minutes, and only once.
+
+Requirements:
+
+- `QUICKBOOKS_REDIRECT_URI` must exactly match a redirect URI registered on the Intuit app. For production this must be HTTPS.
+- The same `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`, `QUICKBOOKS_ENVIRONMENT` and `QUICKBOOKS_TOKEN_STORE_PATH` the server uses must be set in the shell.
+
+Tokens are written to the token store and also printed. If the token store does not persist across restarts (for example a container with no volume), copy the printed `QUICKBOOKS_REFRESH_TOKEN` and `QUICKBOOKS_REALM_ID` into the host's env config and restart the server. In that setup the server cannot persist rotated refresh tokens, so expect to repeat this after restarts.
+
 After completing the production OAuth handshake, the refresh token is what matters — once it's in `.env`, you no longer need the public redirect URL for day-to-day use. Refresh tokens auto-rotate; the server persists the new token on each refresh.
 
 ### Once you have tokens
